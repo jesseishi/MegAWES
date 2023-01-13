@@ -64,7 +64,7 @@ base_windspeed = 22; %
 
 %% Initialization parameters
 simInit.TSIM = 1200; % Maximum simulation time 
-simInit.dt = 0.005; % Fixed-step size
+simInit.dt = 0.001; % Fixed-step size
 simInit.FSI_switchtime = 10000; % switching turned off because there is no active FSI
 
 simInit.FtLoggingTs = 0.01; %Tether force logging sample time
