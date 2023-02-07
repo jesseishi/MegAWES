@@ -45,6 +45,11 @@ function [act, base_windspeed, constr, DE2019, ENVMT, Lbooth, ...
 %------------- BEGIN CODE --------------
 %% Obtain large-scale wing params
 load('DE2019_params.mat','DE2019','constraintOut');
+% Smooth the C_L, C_D, and C_M curves. Currently they are not smooth at the
+% setpoint of alpha, leading to very nonlinear behaviour around that point.
+% DE2019.initAircraft.wing_cL_Static = smoothdata(DE2019.initAircraft.wing_cL_Static, 'gaussian');
+% DE2019.initAircraft.wing_cD_Static = smoothdata(DE2019.initAircraft.wing_cD_Static, 'gaussian');
+% DE2019.initAircraft.wing_cM_Static = smoothdata(DE2019.initAircraft.wing_cM_Static, 'gaussian');
 
 %% Environment struct
 ENVMT.g = 9.8066;
@@ -63,7 +68,7 @@ ENVMT.height_max = h(ENVMT.wind_data==max(ENVMT.wind_data)); % keep wind speed c
 base_windspeed = 22; %
 
 %% Initialization parameters
-simInit.TSIM = 1200; % Maximum simulation time 
+simInit.TSIM = 600; % Maximum simulation time 
 simInit.dt = 0.001; % Fixed-step size
 simInit.FSI_switchtime = 10000; % switching turned off because there is no active FSI
 
@@ -164,8 +169,8 @@ T.alpha2 = 0.745653460592095;
 %% Winch parameters
 %Needs further research at this scale
 winchParameter.lj_dot_init = 0; %initial reel-out speed
-winchParameter.radius = 0.4;
-winchParameter.inertia = 32;
+winchParameter.radius = 0.4;  % old: 0.4;
+winchParameter.inertia = 1e4;  % old: 32;
 winchParameter.friction = 10; %dynamic friction
 winchParameter.winch_angle_init = T.tether_inital_lenght/winchParameter.radius;
 
