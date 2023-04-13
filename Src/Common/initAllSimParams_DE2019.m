@@ -164,8 +164,8 @@ T.alpha2 = 0.745653460592095;
 %% Winch parameters
 %Needs further research at this scale
 winchParameter.lj_dot_init = 0; %initial reel-out speed
-winchParameter.radius = 0.4;
-winchParameter.inertia = 32;
+winchParameter.radius = 1.5;
+winchParameter.inertia = 1e4;
 winchParameter.friction = 10; %dynamic friction
 winchParameter.winch_angle_init = T.tether_inital_lenght/winchParameter.radius;
 
