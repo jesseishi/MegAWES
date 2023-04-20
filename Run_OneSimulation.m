@@ -30,7 +30,7 @@ clc                                 % Clear command window
 
 %% Set variables
 
-Kite_DOF = 6; % Kite degrees of freedom: 3 (point-mass) or 6 (rigid-body)
+Kite_DOF = 3; % Kite degrees of freedom: 3 (point-mass) or 6 (rigid-body)
 % 3DoF: Forced to 22m/s
 % 6DoF: 8m/s  10m/s  14m/s  16m/s  18m/s  20m/s  22m/s  25m/s  28m/s  30m/s
 windspeed = 22; 
@@ -117,3 +117,8 @@ if simOut.power_conv_flag
 else
     warning('Simulation did not converge')
 end
+
+%% Save run.
+close all
+fname = input('name this run: ', "s");
+save("Results\3DOF\" + fname + ".mat")
