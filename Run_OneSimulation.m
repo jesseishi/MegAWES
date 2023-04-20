@@ -33,11 +33,27 @@ clc                                 % Clear command window
 Kite_DOF = 6; % Kite degrees of freedom: 3 (point-mass) or 6 (rigid-body)
 % 3DoF: Forced to 22m/s
 % 6DoF: 8m/s  10m/s  14m/s  16m/s  18m/s  20m/s  22m/s  25m/s  28m/s  30m/s
-windspeed = 18; 
+windspeed = 22; 
 
 [act, base_windspeed, constr, DE2019, ENVMT, Lbooth, ...
 	loiterStates, params, simInit, T, winchParameter] = ...
 	Get_simulation_params(windspeed, Kite_DOF);
+
+%% My winch controller.
+vr_mps = -5:0.1:10;
+
+theta = [187486.8, 7784.0, 30865.2];
+Ft_star_N = theta(1) + theta(2) * vr_mps + theta(3) * vr_mps.^2;
+Ft_star_N = max(Ft_star_N, 0.5e6);
+Ft_star_N(vr_mps < 0) = 0.5e6;
+Ft_star_N(Ft_star_N > 1e6) = 1e6;
+
+figure
+plot(vr_mps, Ft_star_N)
+
+Ft_star_smooth_N = smoothdata(Ft_star_N, 'gaussian', 25);
+hold on
+plot(vr_mps, Ft_star_smooth_N)
 
 %% Run simulation untill average pumping cycle power convergence
 matlab_version = version('-release');
@@ -117,3 +133,53 @@ if simOut.power_conv_flag
 else
     warning('Simulation did not converge')
 end
+
+%% My small analysis.
+traction_idx = sub_flight_state.Data == 4;
+figure(1)
+plot(v_reel.Data(traction_idx), TetherForce.Data(traction_idx))
+ylabel('tether force [N]')
+xlabel('reel-out speed [m/s]')
+hold on
+theta = [187486.8, 7784.0, 30865.2];
+vr_mps = min(0, min(v_reel.Data(traction_idx))):0.1:max(v_reel.Data(traction_idx));
+Ft_star_N = theta(1) + theta(2) * vr_mps + theta(3) * vr_mps.^2;
+Ft_star_N = max(Ft_star_N, 0.5e6);
+Ft_star_N(vr_mps < 0) = 0.5e6;
+Ft_star_N(Ft_star_N > 1e6) = 1e6;
+plot(vr_mps, Ft_star_N, '--');
+hold off
+ylim([0, 1.5e6])
+legend('actual', 'ideal')
+grid on
+
+%% Power.
+addpath('Results\Baseline 13042023\')
+baseline = load('Results/Baseline 13042023/vw22.mat');
+
+%% Plotting
+figure(2)
+plot(P_mech)
+hold on
+plot(baseline.simOut.P_mech)
+
+plot(P_mech.Time, movmean(P_mech.Data, [19, 0], 'SamplePoints', P_mech.Time), ':b', 'LineWidth', 3)
+plot(baseline.simOut.P_mech.Time, movmean(baseline.simOut.P_mech.Data, [19, 0], 'SamplePoints', baseline.simOut.P_mech.Time), ':r', 'LineWidth', 3)
+
+
+grid on
+xlabel('time [s]')
+ylabel('Power [W]')
+xlim([50, 150])
+ylim([-1.0e7, 1.8e7])
+legend('my winch controller', 'current', 'mean my winch controller', 'mean current')
+hold off
+
+%% mean power
+for ts = [P_mech, baseline.simOut.P_mech]
+    % Sensitive to what numbers you pick here.
+    idx = (ts.Time > 40) & (ts.TIme < 155);
+    temp = timeseries(ts.Data(idx), ts.Time(idx));
+    Pmech_avg_W = mean(temp, 'Weighting', 'Time')
+end
+
