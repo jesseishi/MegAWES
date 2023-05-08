@@ -30,5 +30,8 @@ end
 
 function x_pos = abc(a, b, c)
     d = b.^2 - 4*a.*c;
+    if d < 0
+        d=0;
+    end
     x_pos = (-b + sqrt(d)) / (2*a);
 end

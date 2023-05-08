@@ -121,4 +121,4 @@ end
 %% Save run.
 close all
 fname = input('name this run: ', "s");
-save("Results\3DOF_final\" + fname + ".mat")
+save("Results\3DOF_paper\data\" + fname + ".mat")
