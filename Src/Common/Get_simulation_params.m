@@ -46,7 +46,7 @@ function [act, base_windspeed, constr, DE2019, ENVMT, Lbooth, ...
 % :Author: Dylan Eijkelhof (d.eijkelhof@tudelft.nl)
  
 %------------- BEGIN CODE --------------
-    
+
     vw = windspeed;
     
     if Kite_DOF == 3
@@ -82,26 +82,6 @@ function [act, base_windspeed, constr, DE2019, ENVMT, Lbooth, ...
 		params.w0_gamma_retraction_max=0.281603;
 		params.w0_mu=7.6271;
 		params.w0_alpha=3.56748;
-
-        % New parameters added by Jesse Hummel for his MSc thesis:
-        % For the new traction phase winch controller.
-        params.use_kite_tether_force_control=true;  % If false, the winch should also make sure we don't overshoot the max tether force.
-        params.use_Zgraggen=false;
-        params.use_winch_PI=false;
-        params.winch_Ft_min=0.0e6;
-        params.winch_Ft_max=1.390e6;  % 1.390e6 if use_Zgraggen=true, 1.384 if use_Zgraggen=false.
-        params.kp_traction_winch=2.5;%0.2;
-        params.ki_traction_winch=0.8;%0.4;
-
-        % For the kite tether force controller, not used if
-        % use_kite_tether_force_control=false.
-        params.kite_Ft_max=1.364e6;  % 1.425e6 if use_Zgraggen=true, 1.251e6 if use_Zgraggen=false.
-        params.kp_kite_Ft=0.75;  % 1.0 if use_Zgraggen=true, 0.25 if use_Zgraggen=false.
-        params.ki_kite_Ft=1.0;  % 1.5 if use_Zgraggen=true, 0.25 if use_Zgraggen=false.
-
-        % Generator and storage efficiencies.
-        params.n_generator=0.90;
-        params.n_storage=0.95;
         params.n_motor=0.90;
  
     elseif Kite_DOF == 6
@@ -324,6 +304,58 @@ function [act, base_windspeed, constr, DE2019, ENVMT, Lbooth, ...
         base_windspeed = vw;
     else
         error('Wong number of degrees of freedom entered')
+    end
+
+
+    if Kite_DOF == 3
+        % New parameters added by Jesse Hummel for his MSc thesis:
+        % For the new traction phase winch controller.
+        params.use_kite_tether_force_control=true;  % If false, the winch should also make sure we don't overshoot the max tether force.
+        params.use_Zgraggen=false;
+        params.use_winch_PI=false;
+        params.winch_Ft_min=0.0e6;
+        params.winch_Ft_max=1.390e6;  % 1.390e6 if use_Zgraggen=true, 1.384 if use_Zgraggen=false.
+        params.kp_traction_winch=2.5;%0.2;
+        params.ki_traction_winch=0.8;%0.4;
+    
+        % For the kite tether force controller, not used if
+        % use_kite_tether_force_control=false.
+        params.kite_Ft_max=1.364e6;  % 1.425e6 if use_Zgraggen=true, 1.251e6 if use_Zgraggen=false.
+        params.kp_kite_Ft=0.75;  % 1.0 if use_Zgraggen=true, 0.25 if use_Zgraggen=false.
+        params.ki_kite_Ft=1.0;  % 1.5 if use_Zgraggen=true, 0.25 if use_Zgraggen=false.
+    
+        % Generator and storage efficiencies.
+        params.n_generator=0.90;
+        params.n_motor=0.90;
+        params.n_storage=0.95;
+    else
+        % For the new traction phase winch controller.
+        params.use_kite_tether_force_control=true;  % If false, the winch should also make sure we don't overshoot the max tether force.
+        params.use_Zgraggen=true;
+        params.use_winch_PI=false;
+        params.winch_Ft_min=0.5e6;
+        params.winch_Ft_max=1.192e6;  % 1.192e6 if use_Zgraggen=true, 1.384 if use_Zgraggen=false.
+        params.kp_traction_winch=2.5;%0.2;
+        params.ki_traction_winch=0.8;%0.4;
+    
+        % For the kite tether force controller, not used if
+        % use_kite_tether_force_control=false.
+        params.kite_Ft_max=1.425e6;  % 1.425e6 if use_Zgraggen=true, 1.251e6 if use_Zgraggen=false.
+        params.kp_kite_Ft=1.0;  % 1.0 if use_Zgraggen=true, 0.25 if use_Zgraggen=false.
+        params.ki_kite_Ft=1.0;  % 1.5 if use_Zgraggen=true, 0.25 if use_Zgraggen=false.
+    
+        % Generator and storage efficiencies.
+        params.n_generator=0.90;
+        params.n_motor=0.90;
+        params.n_storage=0.95;
+
+        % Direct lift control.
+        DE2019.CL_DLC_alpha = 1.8/pi;    
+        act.dlc.w0 = 75;%35;
+        act.dlc.rl = 4;%2;
+        act.dlc.max_deflection = deg2rad(30);
+        act.dlc.min_deflection = deg2rad(-30);
+        act.dlc.bias = 0;
     end
 %------------- END CODE --------------
 end
