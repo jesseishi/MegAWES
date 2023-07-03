@@ -39,6 +39,7 @@ windspeed = 22;
 	loiterStates, params, simInit, T, winchParameter] = ...
 	Get_simulation_params(windspeed, Kite_DOF);
 
+
 %% Run simulation untill average pumping cycle power convergence
 matlab_version = version('-release');
 if (strcmp(matlab_version,'2019b') || str2double(matlab_version(1:end-1))>2019)
@@ -106,7 +107,7 @@ if simOut.power_conv_flag
 %         filename = [num2str(Average_power/1e6,3) 'MW_6DOF_2.mp4']; 
         
         %%% !!!Create figure to only play the animation
-        filename = [];
+        filename = 'KTFC.mp4';
 
         duration = 30; %seconds
         Video_from_simOut(filename, simOut,simInit,ENVMT,DE2019,duration)
@@ -120,5 +121,17 @@ end
 
 %% Save run.
 close all
-fname = input('name this run: ', "s");
-save("Results\3DOF_paper\data\" + fname + ".mat")
+% fname = input('name this run: ', "s");
+
+fname = string(params.kp_kite_Ft) + "_" + string(params.ki_kite_Ft);
+fname = replace(fname, ".", "p");
+
+name = sprintf("K_p = %.2f, K_i = %.2f", params.kp_kite_Ft, params.ki_kite_Ft);
+short_name = fname;
+
+fprintf("saving %s.mat, %s.\n", fname, name)
+save("Results\3DOF_tuning\data\" + fname + ".mat")
+
+
+
+
