@@ -124,11 +124,30 @@ set(gcf, 'color', 'white');
 sizeScatter = 5;
 Power = P_mech_last_cycle.Data./1e6;
 scatter3(-Path_last_cycle.Data(1,:),Path_last_cycle.Data(2,:),-Path_last_cycle.Data(3,:),sizeScatter*ones(size(Power)),Power,'filled'); hold on
+
+% idx = Power > 0;
+% scatter3(-Path_last_cycle.Data(1, idx), ...
+%          Path_last_cycle.Data(2, idx), ...
+%          -Path_last_cycle.Data(3, idx), ...
+%          'Color', '#77AC30'); hold on
+% idx = Power <= 0;
+% scatter3(-Path_last_cycle.Data(1, idx), ...
+%          Path_last_cycle.Data(2, idx), ...
+%          -Path_last_cycle.Data(3, idx), ...
+%          'Color', '#D95319'); hold on
 enhance_plot('Helvetica',25,2,20,0)
 
 % Colorbar
 LimitsColorBar = [floor(min(Power)/1)*1 ceil(max(Power)/1)*1];
+LimitsColorBar = [-5, 20];
 cb = colorbar('peer',axes1,'Location','eastoutside','FontSize',16);
+mymap = [0.0000 0.4470 0.7410
+         0.4660 0.6740 0.1880
+         0.4660 0.6740 0.1880
+         0.9290 0.6940 0.1250
+         0.8500 0.3250 0.0980];
+% mymap = [0.4660 0.6740 0.1880];
+colormap(mymap);
 cb.Label.String = 'Power, MW';
 caxis(LimitsColorBar)
 cb.FontSize = 16;
@@ -201,8 +220,11 @@ TimePos = [0.6*limitx(2), limity(2), limitz(2)];
 fanimator(axes1,@animation_simtime,Path_last_cycle,TimePos,index_set,Tend,...
     fps,t,'AnimationRange',[0 Tend],'FrameRate',fps)
 
+% Jesse
 h_axes = axes('Parent',fig_pow,'position', cb.Position, 'ylim', cb.Limits, ...
     'color', 'none', 'visible','off');
+% h_axes = axes('Parent',fig_pow, ...
+%     'color', 'none', 'visible','off');
 
 index_set = round(linspace(1,numel(Power),Tend*fps+1));
 fanimator(h_axes,@animation_colorbar,Power,index_set,Tend,...
