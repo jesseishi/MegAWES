@@ -1,6 +1,6 @@
 % Explanation:
 % If you've saved some runs after running `Run_OneSimulation.m`, you can
-% use this file to compare those runs to each other. Make sure to 
+% use this file to compare those runs to each other.
 
 %% Load all results and setup stuff for plotting and saving.
 clear;
@@ -8,6 +8,7 @@ close all;
 
 figure(1)
 colors = get(gca, 'colororder');
+close all;
 
 savedir = "Results/figures/";
 addpath('Results/data')
@@ -20,7 +21,7 @@ for i = 1:length(matfiles)
     name = replace(fname, '_', ' ');
     name = replace(name, '.mat', '');
 
-    % Loa the data.
+    % Load the data.
     temp = load(fname);
     runs(i) = temp.simOut;
 
@@ -32,11 +33,13 @@ end
 
 % Select which ones we want to look at.
 i_select = 1:length(matfiles);
-i_select = [1,5,7,9];
+% i_select = [2,1];
 runs = runs(i_select);
 
 % String representation for storing figures.
 runs_short_name = mat2str(i_select);
+
+runs.name
 
 %% Get the traction part.
 % I only want to analyse the first traction phase, so I can save an index
@@ -85,14 +88,17 @@ for run = runs
 end
 
 
-ylabel('Tether force, N')
-xlabel('Reel-out speed, m/s')
+ylabel('Tether force (N)')
+xlabel('Reel-out speed (m/s)')
 ylim([0, 2.0e6])
-legend('ideal', runs.name, 'Location', 'SouthOutside')
+legend('ideal', runs.name, 'Location', 'best')
+legend('ideal', 'case 2', 'case 1')
+% legend('ideal', 'case 1', 'case 2')
 hold off
 grid on
 
-saveas(gcf, savedir+runs_short_name+"_vrFt.png")
+% saveas(gcf, savedir+runs_short_name+"_vrFt.png")
+saveas(gcf, savedir+"compare_vrFt", 'epsc')
 
 %% Tether force.
 figure(2)

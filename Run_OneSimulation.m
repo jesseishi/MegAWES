@@ -44,7 +44,7 @@ windspeed = 22;
 % This should maybe go in some user selection part together with Kite_DOF
 % and windspeed.
 params.use_passive_torque_control = true;
-params.kite_alpha_mode = 1;  % 1 = inversionPathDynamics (original), 2 = always max alpha, 3 = kite tether force control.
+params.kite_alpha_mode = 3;  % 1 = inversionPathDynamics (original), 2 = always max alpha, 3 = kite tether force control.
 
 % Tuned variables (tuned for 3DOF at 22 m/s). The controller gains were
 % tuned using a grid search whereas the other parameters were iteratively
